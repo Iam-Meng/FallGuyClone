@@ -37,7 +37,6 @@ namespace FallGuyClone
         public event Action Jumped;
         public event Action Knocked;
         public event Action Landed;
-        public event Action Collided;
 
         const float JumpBufferTime = 0.15f;
         const float CoyoteTime = 0.12f;
@@ -50,7 +49,6 @@ namespace FallGuyClone
         float lastGroundedTime = -10f;
         float stunTimer;
         float knockCooldown;
-        float collisionSoundCooldown;
         float groundIgnoreTimer;
         float diveRecoverTimer;
         bool grounded;
@@ -118,7 +116,6 @@ namespace FallGuyClone
             float dt = Time.fixedDeltaTime;
             stunTimer -= dt;
             knockCooldown -= dt;
-            collisionSoundCooldown -= dt;
             groundIgnoreTimer -= dt;
             diveRecoverTimer -= dt;
 
@@ -243,12 +240,6 @@ namespace FallGuyClone
 
         void OnCollisionEnter(Collision c)
         {
-            bool hitHazard = c.collider.GetComponentInParent<Hazard>() != null;
-            if (collisionSoundCooldown <= 0f && (hitHazard || c.relativeVelocity.sqrMagnitude >= 2.25f))
-            {
-                collisionSoundCooldown = 0.25f;
-                Collided?.Invoke();
-            }
             HandleHazard(c);
         }
         void OnCollisionStay(Collision c) => HandleHazard(c);
