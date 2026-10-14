@@ -1841,11 +1841,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8208686ee64ed493aa14dab43491c02f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.PlayerController
-  moveSpeed: 7.5
-  groundAcceleration: 70
+  moveSpeed: 1000
+  groundAcceleration: 100
   airAcceleration: 22
   turnSpeed: 14
-  jumpSpeed: 9
+  jumpSpeed: 15
   diveForwardSpeed: 11
   diveUpSpeed: 4.5
   fallGravityMultiplier: 1.3
@@ -4620,8 +4620,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c2b9b74791294fe29c7b0f79d0d75f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Hazard
-  force: 15
-  upForce: 6
+  force: 150
+  upForce: 200
   stunTime: 0.8
 --- !u!114 &309979963
 MonoBehaviour:
@@ -10757,7 +10757,7 @@ Transform:
   m_GameObject: {fileID: 605017706}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 35}
+  m_LocalPosition: {x: 0, y: 0, z: 32.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10783,9 +10783,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c2b9b74791294fe29c7b0f79d0d75f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Hazard
-  force: 13
-  upForce: 6
-  stunTime: 0.6
+  force: 150
+  upForce: 200
+  stunTime: 0.5
 --- !u!114 &605017709
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10799,7 +10799,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Rotator
   axis: {x: 0, y: 1, z: 0}
-  degreesPerSecond: -55
+  degreesPerSecond: -180
 --- !u!54 &605017710
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -19435,9 +19435,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c2b9b74791294fe29c7b0f79d0d75f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Hazard
-  force: 13
-  upForce: 6
-  stunTime: 0.6
+  force: 150
+  upForce: 200
+  stunTime: 0.5
 --- !u!114 &1047151854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19451,7 +19451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Rotator
   axis: {x: 0, y: 1, z: 0}
-  degreesPerSecond: 75
+  degreesPerSecond: 180
 --- !u!54 &1047151855
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -24340,6 +24340,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1261486918}
   - component: {fileID: 1261486917}
+  - component: {fileID: 1261486919}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -24427,6 +24428,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1261486919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261486916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &1266460261
 GameObject:
   m_ObjectHideFlags: 0
@@ -24891,8 +24921,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c2b9b74791294fe29c7b0f79d0d75f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Hazard
-  force: 15
-  upForce: 6
+  force: 150
+  upForce: 200
   stunTime: 0.8
 --- !u!114 &1281854914
 MonoBehaviour:
@@ -29267,8 +29297,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c2b9b74791294fe29c7b0f79d0d75f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Hazard
-  force: 15
-  upForce: 6
+  force: 150
+  upForce: 200
   stunTime: 0.8
 --- !u!114 &1516593598
 MonoBehaviour:
@@ -38163,8 +38193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c2b9b74791294fe29c7b0f79d0d75f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallGuyClone.Hazard
-  force: 15
-  upForce: 6
+  force: 150
+  upForce: 200
   stunTime: 0.8
 --- !u!114 &2024573216
 MonoBehaviour:
