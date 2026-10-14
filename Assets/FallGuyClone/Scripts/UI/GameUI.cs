@@ -21,6 +21,7 @@ namespace FallGuyClone
         GameObject menuPanel;
         GameObject pausePanel;
         GameObject resultPanel;
+        GameObject catOverlay;
         Text skinText;
         Text bestText;
         Text resultTitle;
@@ -28,6 +29,8 @@ namespace FallGuyClone
 
         float bigTimer;
         float toastTimer;
+        float catTimer;
+        bool catPersistent;
 
         public static GameUI Create()
         {
@@ -91,6 +94,21 @@ namespace FallGuyClone
             toastText = Label(transform, "", 54, Art.Cyan);
             Place(toastText.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, -140f), new Vector2(1200f, 90f));
 
+            catOverlay = new GameObject("Laughing Cat", typeof(RectTransform));
+            catOverlay.transform.SetParent(transform, false);
+            Place((RectTransform)catOverlay.transform, new Vector2(0f, 1f),
+                new Vector2(140f, -140f), new Vector2(250f, 260f), new Vector2(0f, 1f));
+            var catImageObject = new GameObject("Cat Illustration", typeof(RectTransform), typeof(Image));
+            catImageObject.transform.SetParent(catOverlay.transform, false);
+            var catImage = catImageObject.GetComponent<Image>();
+            catImage.sprite = GameFeedback.CatSprite;
+            catImage.preserveAspect = true;
+            catImage.raycastTarget = false;
+            Place(catImage.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, 15f), new Vector2(220f, 220f));
+            var catCaption = Label(catOverlay.transform, "HAHA!", 52, Art.Yellow);
+            Place(catCaption.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, -105f), new Vector2(230f, 60f));
+            catOverlay.SetActive(false);
+
             // ----- Main menu -----
             menuPanel = Panel("Menu", transform, new Color(0.25f, 0.12f, 0.45f, 0.55f)).gameObject;
             var title = Label(menuPanel.transform, "FALL GUY CLONE", 150, Art.Yellow);
@@ -134,6 +152,8 @@ namespace FallGuyClone
 
         public void ShowState(GameState s)
         {
+            if (s == GameState.Menu || s == GameState.Countdown || s == GameState.Qualified)
+                HideCat();
             hud.SetActive(s == GameState.Countdown || s == GameState.Playing || s == GameState.Paused);
             menuPanel.SetActive(s == GameState.Menu);
             pausePanel.SetActive(s == GameState.Paused);
@@ -175,6 +195,21 @@ namespace FallGuyClone
             bigText.text = text;
             bigText.color = color;
             bigTimer = 1f;
+        }
+
+        public void ShowCat(float duration = 0f, bool persistent = false)
+        {
+            catPersistent = persistent;
+            catTimer = duration;
+            catOverlay.SetActive(true);
+            catOverlay.transform.SetAsLastSibling();
+        }
+
+        void HideCat()
+        {
+            catPersistent = false;
+            catTimer = 0f;
+            if (catOverlay != null) catOverlay.SetActive(false);
         }
 
         public void Toast(string text, Color color)
@@ -228,6 +263,12 @@ namespace FallGuyClone
                 var c = toastText.color;
                 c.a = Mathf.Clamp01(toastTimer * 2f);
                 toastText.color = c;
+            }
+
+            if (!catPersistent && catOverlay.activeSelf)
+            {
+                catTimer -= dt;
+                if (catTimer <= 0f) HideCat();
             }
         }
 

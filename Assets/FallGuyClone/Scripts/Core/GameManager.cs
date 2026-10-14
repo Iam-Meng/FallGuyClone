@@ -16,6 +16,8 @@ namespace FallGuyClone
 
         const string BestTimeKey = "FallGuyClone_BestTime";
         const string SkinKey = "FallGuyClone_Skin";
+        const float HighFlightHeight = 24f;
+        const float HighFlightDuration = 2.5f;
 
         public GameState State { get; private set; }
         public float TimeLimit { get; private set; }
@@ -33,9 +35,11 @@ namespace FallGuyClone
         PlayerAvatar avatar;
         ThirdPersonCamera cam;
         GameUI ui;
+        GameFeedback feedback;
         Course course;
         Vector3 respawnPoint;
         float countdown;
+        float highFlightTimer;
         GameState stateBeforePause;
 
         public void Init(PlayerController player, PlayerAvatar avatar, ThirdPersonCamera cam, GameUI ui, Course course, float timeLimit)
@@ -46,6 +50,8 @@ namespace FallGuyClone
             this.cam = cam;
             this.ui = ui;
             this.course = course;
+            feedback = gameObject.AddComponent<GameFeedback>();
+            feedback.Bind(player);
             TimeLimit = timeLimit;
             TimeLeft = timeLimit;
             CheckpointCount = course.checkpoints.Count;
@@ -78,6 +84,7 @@ namespace FallGuyClone
             countdown = 3f;
             TimeLeft = TimeLimit;
             Elapsed = 0f;
+            highFlightTimer = 0f;
             SetState(GameState.Countdown);
         }
 
@@ -159,8 +166,15 @@ namespace FallGuyClone
         {
             TimeLeft = 0f;
             avatar.ForcedPose = PlayerAvatar.Pose.Lose;
+            ShowCatReaction(persistent: true);
             ui.SetResult(false, false);
             SetState(GameState.Eliminated);
+        }
+
+        void ShowCatReaction(float duration = 0f, bool persistent = false)
+        {
+            ui.ShowCat(duration, persistent);
+            feedback.PlayCatLaugh();
         }
 
         void SetState(GameState s)
@@ -226,17 +240,40 @@ namespace FallGuyClone
                 case GameState.Playing:
                     TimeLeft -= Time.deltaTime;
                     Elapsed += Time.deltaTime;
-                    if (TimeLeft <= 0f) Eliminate();
+                    if (TimeLeft <= 0f)
+                    {
+                        Eliminate();
+                        break;
+                    }
+
+                    if (!player.IsGrounded && player.transform.position.y >= HighFlightHeight)
+                    {
+                        highFlightTimer += Time.deltaTime;
+                        if (highFlightTimer >= HighFlightDuration)
+                        {
+                            Falls++;
+                            ShowCatReaction(2.5f);
+                            RespawnPlayer("TOO HIGH!");
+                        }
+                    }
+                    else highFlightTimer = 0f;
                     break;
             }
 
             if (player.transform.position.y < course.killY && State != GameState.Paused)
+            {
+                if (State == GameState.Playing)
+                {
+                    ShowCatReaction(2.5f);
+                }
                 RespawnPlayer(State == GameState.Playing ? "OOPS!" : null);
+            }
         }
 
         void RespawnPlayer(string message)
         {
             if (message == "OOPS!") Falls++;
+            highFlightTimer = 0f;
             player.Teleport(respawnPoint, Quaternion.identity);
             cam.yaw = 0f;
             cam.SnapBehindTarget();
