@@ -1,11 +1,15 @@
+using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FallGuyClone
 {
-    /// <summary>Creates the game's original impact and cat feedback without external assets.</summary>
+    /// <summary>Uses the provided art and sound assets when available, then falls back to generated versions.</summary>
     public class GameFeedback : MonoBehaviour
     {
         const int SampleRate = 22050;
+        const string SoundsFolder = "Sounds";
+        const string DocImagesFolder = "Docs/Images";
 
         static Sprite catSprite;
 
@@ -18,7 +22,7 @@ namespace FallGuyClone
         {
             get
             {
-                if (catSprite == null) catSprite = CreateCatSprite();
+                if (catSprite == null) catSprite = LoadCatSprite();
                 return catSprite;
             }
         }
@@ -29,8 +33,8 @@ namespace FallGuyClone
             source.playOnAwake = false;
             source.spatialBlend = 0f;
             source.volume = 0.65f;
-            clang = CreateClang();
-            catLaugh = CreateCatLaugh();
+            clang = LoadAudioClipOrFallback("metal-pipe-clang.mp3", CreateClang);
+            catLaugh = LoadAudioClipOrFallback("cat-laughing-at-you.mp3", CreateCatLaugh);
         }
 
         public void Bind(PlayerController controller)
@@ -54,6 +58,72 @@ namespace FallGuyClone
         {
             source.PlayOneShot(catLaugh);
         }
+
+        static AudioClip LoadAudioClipOrFallback(string fileName, System.Func<AudioClip> fallback)
+        {
+            var clip = TryLoadAudioClip(fileName);
+            return clip != null ? clip : fallback();
+        }
+
+        static AudioClip TryLoadAudioClip(string fileName)
+        {
+            var root = GetProjectRoot();
+            string path = Path.Combine(root, SoundsFolder, fileName);
+            if (!File.Exists(path)) return null;
+
+            try
+            {
+                using var request = UnityWebRequestMultimedia.GetAudioClip(new Uri(path).AbsoluteUri, AudioType.MPEG);
+                request.SendWebRequest();
+                while (!request.isDone)
+                {
+                    // Keep the file load synchronous at startup so the audio is ready immediately.
+                }
+
+                if (request.result != UnityWebRequest.Result.Success)
+                    return null;
+
+                var clip = DownloadHandlerAudioClip.GetContent(request);
+                if (clip == null)
+                    return null;
+
+                clip.name = fileName;
+                return clip;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        static Sprite LoadCatSprite()
+        {
+            foreach (string candidate in new[]
+            {
+                Path.Combine(GetProjectRoot(), DocImagesFolder, "menu.jpg"),
+                Path.Combine(GetProjectRoot(), DocImagesFolder, "gameplay.jpg"),
+                Path.Combine(GetProjectRoot(), DocImagesFolder, "course.jpg"),
+                Path.Combine(GetProjectRoot(), DocImagesFolder, "finish.jpg")
+            })
+            {
+                if (!File.Exists(candidate)) continue;
+                var bytes = File.ReadAllBytes(candidate);
+                var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                if (!texture.LoadImage(bytes))
+                {
+                    Object.Destroy(texture);
+                    continue;
+                }
+
+                var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
+                sprite.name = Path.GetFileName(candidate);
+                return sprite;
+            }
+
+            return CreateCatSprite();
+        }
+
+        static string GetProjectRoot() => Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
 
         static AudioClip CreateClang()
         {
